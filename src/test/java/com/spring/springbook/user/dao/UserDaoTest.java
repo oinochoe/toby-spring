@@ -1,27 +1,36 @@
 package com.spring.springbook.user.dao;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static javafx.scene.input.KeyCode.T;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import java.sql.SQLException;
 import java.util.List;
 
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
+import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.spring.springbook.user.domain.User;
+
+import javax.sql.DataSource;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="/test-applicationContext.xml")
 public class UserDaoTest {
     @Autowired
     private UserDao dao;
+    @Autowired DataSource dataSource;
 
     private User user1;
     private User user2;
@@ -113,7 +122,25 @@ public class UserDaoTest {
         dao.deleteAll();
 
         dao.add(user1);
-        dao.add(user2); // 강제로 두번 등록
+        dao.add(user1); // 강제로 두번 등록
+    }
+
+    @Test
+    public void sqlExceptionTranslate() {
+        dao.getAll();
+
+        try {
+            dao.add(user1);
+            dao.add(user1);
+        }
+        catch (DuplicateKeyException ex) {
+            SQLException sqlEx = (SQLException) ex.getRootCause(); // 중첩된 SQLException 가져옴
+            // 예외전환
+            SQLExceptionTranslator set =
+                    new SQLErrorCodeSQLExceptionTranslator(this.dataSource);
+            DataAccessException transEx = set.translate(null, null, sqlEx);
+            assertThat(transEx, is(DuplicateKeyException.class));
+        }
     }
 
 }

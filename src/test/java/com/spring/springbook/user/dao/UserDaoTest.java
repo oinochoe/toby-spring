@@ -1,6 +1,5 @@
 package com.spring.springbook.user.dao;
 
-import static javafx.scene.input.KeyCode.T;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
@@ -8,17 +7,12 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.spring.springbook.user.domain.Level;
-import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
-import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -29,8 +23,7 @@ import javax.sql.DataSource;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="/test-applicationContext.xml")
 public class UserDaoTest {
-    @Autowired
-    private UserDao dao;
+    @Autowired UserDao dao;
     @Autowired DataSource dataSource;
 
     private User user1;
@@ -119,24 +112,8 @@ public class UserDaoTest {
         assertThat(user1.getRecommend(), is(user2.getRecommend()));
     }
 
-    @Test
-    public void update() {
-        dao.deleteAll();
 
-        dao.add(user1);
-
-        user1.setName("민영김");
-        user1.setPassword("민영김비번바뀜");
-        user1.setLevel(Level.GOLD);
-        user1.setLogin(1000);
-        user1.setRecommend(999);
-        dao.update(user1);
-
-        User user1update = dao.get(user1.getId());
-        checkSameUser(user1, user1update);
-    }
-
-   /* @Test(expected= DataAccessException.class)
+    /*@Test(expected=DataAccessException.class)
     public void duplicateKey() {
         dao.deleteAll();
 
@@ -161,5 +138,26 @@ public class UserDaoTest {
             assertThat(transEx, is(DuplicateKeyException.class));
         }
     }*/
+
+    @Test
+    public void update() {
+        dao.deleteAll();
+
+        dao.add(user1); // 수정할 사용자
+        dao.add(user2); // 수정하지 않을 사용자
+
+        user1.setName("민영김");
+        user1.setPassword("민영김비번바뀜");
+        user1.setLevel(Level.GOLD);
+        user1.setLogin(1000);
+        user1.setRecommend(999);
+
+        dao.update(user1);
+
+        User user1update = dao.get(user1.getId());
+        checkSameUser(user1, user1update);
+        User user2same = dao.get(user2.getId());
+        checkSameUser(user2, user2same);
+    }
 
 }

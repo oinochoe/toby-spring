@@ -12,7 +12,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
+import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -113,15 +116,15 @@ public class UserDaoTest {
     }
 
 
-    /*@Test(expected=DataAccessException.class)
+    @Test(expected=DataAccessException.class)
     public void duplicateKey() {
         dao.deleteAll();
 
         dao.add(user1);
         dao.add(user1); // 강제로 두번 등록
-    }*/
+    }
 
-    /*@Test
+    @Test
     public void sqlExceptionTranslate() {
         dao.getAll();
 
@@ -135,9 +138,9 @@ public class UserDaoTest {
             SQLExceptionTranslator set =
                     new SQLErrorCodeSQLExceptionTranslator(this.dataSource);
             DataAccessException transEx = set.translate(null, null, sqlEx);
-            assertThat(transEx, is(DuplicateKeyException.class));
+            //assertThat(transEx, is(DuplicateKeyException.class));
         }
-    }*/
+    }
 
     @Test
     public void update() {

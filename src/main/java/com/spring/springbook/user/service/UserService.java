@@ -69,8 +69,8 @@ public class UserService {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user.getEmail());
         mailMessage.setFrom("useradmin@ksug.org");
-        mailMessage.setSubject("Upgrade ¾È³»");
-        mailMessage.setText("»ç¿ëÀÚ´ÔÀÇ µî±ÞÀÌ " + user.getLevel().name());
+        mailMessage.setSubject("Upgrade 안내");
+        mailMessage.setText("사용자님의 등급이 " + user.getLevel().name());
 
         this.mailSender.send(mailMessage);
     }

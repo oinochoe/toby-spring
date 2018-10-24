@@ -53,13 +53,17 @@ public class UserServiceTest {
         checkLevelUpgraded(users.get(4), false);
     }
 
+    // 다음 레벨로 업그레이드 될 것인가 아닌가를 지정한다.
     private void checkLevelUpgraded(User user, boolean upgraded) {
         User userUpdate = userDao.get(user.getId());
         if (upgraded) {
+            // 다음레벨이 무엇인가는 Level에게 물어보면 된다.
             assertThat(userUpdate.getLevel(), is(user.getLevel().nextLevel()));
+            // 업그레이드가 일어났는지 확인
         }
         else {
             assertThat(userUpdate.getLevel(), is(user.getLevel()));
+            // 업그레이드가 일어나지 않았는지 확인
         }
     }
 

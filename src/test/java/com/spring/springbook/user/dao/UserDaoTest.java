@@ -125,7 +125,7 @@ public class UserDaoTest {
         dao.add(user1); // 강제로 두번 등록
     }
 
-    @Test
+    /*@Test
     public void sqlExceptionTranslate() {
         dao.getAll();
 
@@ -141,6 +141,6 @@ public class UserDaoTest {
             DataAccessException transEx = set.translate(null, null, sqlEx);
             assertThat(transEx, is(DuplicateKeyException.class));
         }
-    }
+    }*/
 
 }

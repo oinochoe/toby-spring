@@ -35,7 +35,8 @@ public class UserService {
         }
     }
 
-    private void upgradeLevel(User user) {
+    // 오버라이딩이 가능하도록 접근자 수정
+    protected void upgradeLevel(User user) {
         user.upgradeLevel();
         userDao.update(user);
     }

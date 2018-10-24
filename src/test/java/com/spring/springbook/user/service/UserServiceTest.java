@@ -31,6 +31,7 @@ public class UserServiceTest {
     @Before
     public void setUp() {
         users = Arrays.asList(
+                // 테스트에서는 가능한한 경계값 사용 (ex) -1)
                 new User("kym", "김영민", "p1", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER-1, 0),
                 new User("psm", "박성민", "p2", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, 0),
                 new User("aji", "안재일", "p3", Level.SILVER, 60, MIN_RECCOMEND_FOR_GOLD-1),
@@ -85,5 +86,44 @@ public class UserServiceTest {
 
         assertThat(userWithLevelRead.getLevel(), is(userWithLevel.getLevel()));
         assertThat(userWithoutLevelRead.getLevel(), is(Level.BASIC));
+    }
+
+    @Test
+    public void upgradeAllOrNothing() {
+        UserService testUserService = new TestUserService(users.get(3).getId());
+        testUserService.setUserDao(this.userDao);
+        userDao.deleteAll();
+        for(User user : users) userDao.add(user);
+
+        try {
+            // TestUserService는 업그레이드 작업 중에 예외가 발생해야 한다.
+            // 정상종료라면 문제가 있으니 실패.
+            testUserService.upgradeLevels();
+            fail("TestUserServiceException expected");
+        }
+        catch(TestUserServiceException e) {
+            // TestUserService가 던져주는 예외를 잡아서 계속 진행하도록 한다. 그 외의 예외라면 테스트 실패.
+        }
+
+        checkLevelUpgraded(users.get(1), false);
+        // 예외가 발생하기 전에 레벨 변경이 있었던 사용자의 레벨이 처음 상태로 바뀌었나 확인.
+    }
+
+    static class TestUserService extends UserService {
+        private String id;
+
+        // 예외를 발생시킬 User 오브젝트의 id를 지정할 수 있게 만든다.
+        private TestUserService(String id) {
+            this.id = id;
+        }
+
+        protected void upgradeLevel(User user) { // UserService의 메소드를 오버라이드 한다.
+            if (user.getId().equals(this.id)) throw new TestUserServiceException();
+            // 지정된 id의 User 오브젝트가 발견되면 예외를 던져서 작업을 강제로 중단시킨다.
+            super.upgradeLevel(user);
+        }
+    }
+
+    static class TestUserServiceException extends RuntimeException {
     }
 }

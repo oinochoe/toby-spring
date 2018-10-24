@@ -3,28 +3,52 @@ package com.spring.springbook.user.service;
 import com.spring.springbook.user.dao.UserDao;
 import com.spring.springbook.user.domain.Level;
 import com.spring.springbook.user.domain.User;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
+
 
 public class UserService {
     public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
     public static final int MIN_RECCOMEND_FOR_GOLD = 30;
 
-    UserDao userDao;
+    private UserDao userDao;
+    private MailSender mailSender;
+    private PlatformTransactionManager transactionManager;
 
     public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
     }
 
+    public void setMailSender(MailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+
+    public void setTransactionManager(PlatformTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
+
     public void upgradeLevels() {
-        List<User> users = userDao.getAll();
-        for(User user : users) {
-            // 레벨의 변경이 있는 경우에만 업그레이드 호출
-            if (canUpgradeLevel(user)) {
-                upgradeLevel(user);
+        TransactionStatus status =
+                this.transactionManager.getTransaction(new DefaultTransactionDefinition());
+        try {
+            List<User> users = userDao.getAll();
+            for (User user : users) {
+                if (canUpgradeLevel(user)) {
+                    upgradeLevel(user);
+                }
             }
+            this.transactionManager.commit(status);
+        } catch (RuntimeException e) {
+            this.transactionManager.rollback(status);
+            throw e;
         }
     }
+
     private boolean canUpgradeLevel(User user) {
         Level currentLevel = user.getLevel();
         switch(currentLevel) {
@@ -35,15 +59,24 @@ public class UserService {
         }
     }
 
-    // 오버라이딩이 가능하도록 접근자 수정
     protected void upgradeLevel(User user) {
         user.upgradeLevel();
         userDao.update(user);
+        sendUpgradeEMail(user);
+    }
+
+    private void sendUpgradeEMail(User user) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setFrom("useradmin@ksug.org");
+        mailMessage.setSubject("Upgrade ¾È³»");
+        mailMessage.setText("»ç¿ëÀÚ´ÔÀÇ µî±ÞÀÌ " + user.getLevel().name());
+
+        this.mailSender.send(mailMessage);
     }
 
     public void add(User user) {
         if (user.getLevel() == null) user.setLevel(Level.BASIC);
         userDao.add(user);
     }
-
 }

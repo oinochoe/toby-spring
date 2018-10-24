@@ -7,15 +7,22 @@ public class User {
     String id;
     String name;
     String password;
+    Level level;
+    int login;
+    int recommend;
 
     public User() {
     }
 
-    public User(String id, String name, String password) {
+
+    public User(String id, String name, String password, Level level, int login, int recommend) {
         super();
         this.id = id;
         this.name = name;
         this.password = password;
+        this.level = level;
+        this.login = login;
+        this.recommend = recommend;
     }
 
 }

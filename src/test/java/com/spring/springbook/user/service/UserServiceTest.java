@@ -24,6 +24,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -235,7 +236,8 @@ public class UserServiceTest {
     }
 
     @Test
-    @Transactional(propagation=Propagation.NEVER)
+    @Transactional
+    @Rollback(false)
     public void transactionSync() {
         userService.deleteAll();
         userService.add(users.get(0));

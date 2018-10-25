@@ -35,13 +35,13 @@ public class UserDaoTest {
 
     @Before
     public void setUp() {
-        this.user1 = new User("kym", "김영민", "springno1", "copstyle@naver.com", Level.BASIC, 1, 0);
-        this.user2 = new User("psm", "박성민", "springno2", "copstyle@naver.com", Level.SILVER, 55, 10);
-        this.user3 = new User("aji", "안재일", "springno3", "copstyle@naver.com", Level.GOLD, 100, 40);
+        this.user1 = new User("gyumee", "박성철", "springno1", "user1@ksug.org", Level.BASIC, 1, 0);
+        this.user2 = new User("leegw700", "이길원", "springno2", "user2@ksug.org", Level.SILVER, 55, 10);
+        this.user3 = new User("bumjin", "박범진", "springno3", "user3@ksug.org", Level.GOLD, 100, 40);
     }
 
     @Test
-    public void addAndGet() {
+    public void andAndGet() {
         dao.deleteAll();
         assertThat(dao.getCount(), is(0));
 
@@ -116,28 +116,25 @@ public class UserDaoTest {
         assertThat(user1.getRecommend(), is(user2.getRecommend()));
     }
 
-
-    @Test(expected=DataAccessException.class)
-    public void duplicateKey() {
+    @Test(expected=DuplicateKeyException.class)
+    public void duplciateKey() {
         dao.deleteAll();
 
         dao.add(user1);
-        dao.add(user1); // 강제로 두번 등록
+        dao.add(user1);
     }
 
     @Test
     public void sqlExceptionTranslate() {
-        dao.getAll();
+        dao.deleteAll();
 
         try {
             dao.add(user1);
             dao.add(user1);
         }
-        catch (DuplicateKeyException ex) {
-            SQLException sqlEx = (SQLException) ex.getRootCause(); // 중첩된 SQLException 가져옴
-            // 예외전환
-            SQLExceptionTranslator set =
-                    new SQLErrorCodeSQLExceptionTranslator(this.dataSource);
+        catch(DuplicateKeyException ex) {
+            SQLException sqlEx = (SQLException)ex.getCause();
+            SQLExceptionTranslator set = new SQLErrorCodeSQLExceptionTranslator(this.dataSource);
             DataAccessException transEx = set.translate(null, null, sqlEx);
             //assertThat(transEx, is(DuplicateKeyException.class));
         }
@@ -147,11 +144,12 @@ public class UserDaoTest {
     public void update() {
         dao.deleteAll();
 
-        dao.add(user1); // 수정할 사용자
-        dao.add(user2); // 수정하지 않을 사용자
+        dao.add(user1);		// 수정할 사용자
+        dao.add(user2);		// 수정하지 않을 사용자
 
-        user1.setName("민영김");
-        user1.setPassword("민영김비번바뀜");
+        user1.setName("오민규");
+        user1.setPassword("springno6");
+        user1.setEmail("user6@ksug.org");
         user1.setLevel(Level.GOLD);
         user1.setLogin(1000);
         user1.setRecommend(999);

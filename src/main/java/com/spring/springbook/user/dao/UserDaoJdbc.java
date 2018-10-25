@@ -38,12 +38,6 @@ public class UserDaoJdbc implements UserDao {
             user.getId(), user.getName(), user.getPassword(), user.getEmail(), user.getLevel().intValue(), user.getLogin(), user.getRecommend());
     }
 
-    public void update(User user){
-        this.jdbcTemplate.update("update users set name = ?, password = ?, email = ?, level = ?, login = ?, " +
-                "recommend = ? where id = ? ", user.getName(), user.getPassword(), user.getEmail(), user.getLevel().intValue(),
-                user.getLogin(), user.getRecommend(), user.getId());
-    }
-
     public User get(String id) {
         return this.jdbcTemplate.queryForObject("select * from users where id = ?",
                 new Object[] {id}, this.userMapper);
@@ -59,5 +53,11 @@ public class UserDaoJdbc implements UserDao {
 
     public List<User> getAll() {
         return this.jdbcTemplate.query("select * from users order by id",this.userMapper);
+    }
+
+    public void update(User user){
+        this.jdbcTemplate.update("update users set name = ?, password = ?, email = ?, level = ?, login = ?, " +
+                        "recommend = ? where id = ? ", user.getName(), user.getPassword(), user.getEmail(), user.getLevel().intValue(),
+                user.getLogin(), user.getRecommend(), user.getId());
     }
 }

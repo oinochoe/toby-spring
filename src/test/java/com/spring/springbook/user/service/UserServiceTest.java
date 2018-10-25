@@ -12,7 +12,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -34,6 +36,7 @@ public class UserServiceTest {
     @Autowired UserServiceImpl userServiceImpl;
     @Autowired MailSender mailSender;
     @Autowired PlatformTransactionManager transactionManager;
+    @Autowired ApplicationContext context;
 
     List<User> users; // fixture
 
@@ -63,8 +66,8 @@ public class UserServiceTest {
 
         List<User> updated = mockUserDao.getUpdated();
         assertThat(updated.size(), is(2));
-        checkUserAndLevel(updated.get(0), "joytouch", Level.SILVER);
-        checkUserAndLevel(updated.get(1), "madnite1", Level.GOLD);
+        checkUserAndLevel(updated.get(0), "psm", Level.SILVER);
+        checkUserAndLevel(updated.get(1), "cuh", Level.GOLD);
 
         List<String> request = mockMailSender.getRequests();
         assertThat(request.size(), is(2));
@@ -150,14 +153,16 @@ public class UserServiceTest {
     }
 
     @Test
+    @DirtiesContext
     public void upgradeAllOrNothing() {
         TestUserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(userDao);
         testUserService.setMailSender(mailSender);
 
-        UserServiceTx txUserService = new UserServiceTx();
-        txUserService.setTransactionManager(transactionManager);
-        txUserService.setUserService(testUserService);
+        ProxyFactoryBean txProxyFactoryBean =
+                context.getBean("&userService", ProxyFactoryBean.class);
+        txProxyFactoryBean.setTarget(testUserService);
+        UserService txUserService = (UserService) txProxyFactoryBean.getObject();
 
         userDao.deleteAll();
         for(User user : users) userDao.add(user);

@@ -12,12 +12,20 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import java.util.List;
 
 
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
     public static final int MIN_RECCOMEND_FOR_GOLD = 30;
 
     private UserDao userDao;
     private MailSender mailSender;
+
+    public void setUserDao(UserDao userDao) {
+        this.userDao = userDao;
+    }
+
+    public void setMailSender(MailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     public void upgradeLevels() {
         List<User> users = userDao.getAll();
@@ -48,8 +56,8 @@ public class UserServiceImpl implements UserService{
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user.getEmail());
         mailMessage.setFrom("useradmin@ksug.org");
-        mailMessage.setSubject("Upgrade 안내");
-        mailMessage.setText("사용자님의 등급이 " + user.getLevel().name());
+        mailMessage.setSubject("사용자");
+        mailMessage.setText("사용자 등급이 업그레이드 될수 없음" + user.getLevel().name());
 
         this.mailSender.send(mailMessage);
     }

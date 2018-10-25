@@ -5,9 +5,6 @@ import com.spring.springbook.user.domain.Level;
 import com.spring.springbook.user.domain.User;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
 
@@ -66,4 +63,8 @@ public class UserServiceImpl implements UserService {
         if (user.getLevel() == null) user.setLevel(Level.BASIC);
         userDao.add(user);
     }
+    public void deleteAll() { userDao.deleteAll(); }
+    public User get(String id) { return userDao.get(id); }
+    public List<User> getAll() { return userDao.getAll(); }
+    public void update(User user) { userDao.update(user); }
 }

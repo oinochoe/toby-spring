@@ -32,6 +32,41 @@ import com.spring.springbook.user.dao.UserDao;
 import com.spring.springbook.user.domain.Level;
 import com.spring.springbook.user.domain.User;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static com.spring.springbook.user.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
+import static com.spring.springbook.user.service.UserServiceImpl.MIN_RECCOMEND_FOR_GOLD;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.dao.TransientDataAccessResourceException;
+import org.springframework.mail.MailException;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.spring.springbook.user.dao.UserDao;
+import com.spring.springbook.user.domain.Level;
+import com.spring.springbook.user.domain.User;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="/test-applicationContext.xml")
 public class UserServiceTest {
@@ -84,10 +119,9 @@ public class UserServiceTest {
         assertThat(updated.getLevel(), is(expectedLevel));
     }
 
-
     static class MockUserDao implements UserDao {
         private List<User> users;
-        private List<User> updated = new ArrayList();
+        private List<User> updated = new ArrayList<User>();
 
         private MockUserDao(List<User> users) {
             this.users = users;
@@ -110,7 +144,6 @@ public class UserServiceTest {
         public User get(String id) { throw new UnsupportedOperationException(); }
         public int getCount() { throw new UnsupportedOperationException(); }
     }
-
 
     static class MockMailSender implements MailSender {
         private List<String> requests = new ArrayList<String>();
@@ -181,7 +214,6 @@ public class UserServiceTest {
         assertThat(userWithLevelRead.getLevel(), is(userWithLevel.getLevel()));
         assertThat(userWithoutLevelRead.getLevel(), is(Level.BASIC));
     }
-
     @Test
     public void upgradeAllOrNothing() {
         userDao.deleteAll();
@@ -197,17 +229,38 @@ public class UserServiceTest {
         checkLevelUpgraded(users.get(1), false);
     }
 
-    static class TestUserServiceImpl extends UserServiceImpl {
+    @Test(expected=TransientDataAccessResourceException.class)
+    public void readOnlyTransactionAttribute() {
+        testUserService.getAll();
+    }
+
+    @Test
+    @Transactional(propagation=Propagation.NEVER)
+    public void transactionSync() {
+        userService.deleteAll();
+        userService.add(users.get(0));
+        userService.add(users.get(1));
+    }
+
+    static class TestUserService extends UserServiceImpl {
         private String id = "madnite1"; // users(3).getId()
 
         protected void upgradeLevel(User user) {
             if (user.getId().equals(this.id)) throw new TestUserServiceException();
             super.upgradeLevel(user);
         }
+
+        public List<User> getAll() {
+            for(User user : super.getAll()) {
+                super.update(user);
+            }
+            return null;
+        }
     }
 
     static class TestUserServiceException extends RuntimeException {
     }
+
 
 
 }

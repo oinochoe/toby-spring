@@ -7,7 +7,7 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
-    <bean id="message" class="springbook.learningtest.spring.factorybean.MessageFactoryBean">
+    <bean id="message" class="com.spring.springbook.learningtest.spring.factorybean.MessageFactoryBean">
         <property name="text" value="Factory Bean" />
     </bean>
 

@@ -42,7 +42,7 @@ public class UserDaoJdbc implements UserDao {
 
     public void add(User user) {
         this.jdbcTemplate.update(
-                this.sqlMap.get("add"),
+                this.sqlMap.get("add"), // xml 프로퍼티로 제공받은 맵으로 부터 키를 이용해서 필요한 SQL을 가져온다.
                 user.getId(), user.getName(), user.getPassword(), user.getEmail(),
                 user.getLevel().intValue(), user.getLogin(), user.getRecommend());
     }

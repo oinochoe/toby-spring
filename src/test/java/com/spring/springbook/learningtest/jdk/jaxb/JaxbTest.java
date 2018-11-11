@@ -21,7 +21,7 @@ public class JaxbTest {
         // contextPath = 바인딩용 클래스들 위치를 가지고 JAXB컨텍스트를 만든다
 
         Unmarshaller unmarshaller = context.createUnmarshaller(); // 언마샬러 생성
-
+        System.out.println(getClass().getResourceAsStream("sqlmap.xml"));
         Sqlmap sqlmap = (Sqlmap) unmarshaller.unmarshal(
             // 언마샬을 하면 매핑된 오브젝트 트리의 루트인 Sqlmap을 돌려준다.
             getClass().getResourceAsStream("sqlmap.xml"));

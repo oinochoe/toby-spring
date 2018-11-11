@@ -1,4 +1,4 @@
-package com.spring.springbook.user.service;
+package com.spring.springbook.user.service.sqlservice;
 
 import com.spring.springbook.user.domain.User;
 import org.springframework.transaction.annotation.Transactional;

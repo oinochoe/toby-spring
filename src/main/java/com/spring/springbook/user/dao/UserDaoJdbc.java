@@ -8,7 +8,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import com.spring.springbook.user.domain.Level;
-import com.spring.springbook.user.service.SqlService;
+import com.spring.springbook.user.service.sqlservice.SqlService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import com.spring.springbook.user.domain.User;

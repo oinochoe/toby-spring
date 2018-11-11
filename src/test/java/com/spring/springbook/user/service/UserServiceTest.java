@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.spring.springbook.user.service.sqlservice.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +41,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="/test-applicationContext.xml")
 public class UserServiceTest {
-    @Autowired UserService userService;
+    @Autowired
+    UserService userService;
     @Autowired UserService testUserService;
     @Autowired UserDao userDao;
     @Autowired MailSender mailSender;

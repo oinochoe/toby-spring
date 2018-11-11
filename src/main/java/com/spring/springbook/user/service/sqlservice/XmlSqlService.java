@@ -1,4 +1,4 @@
-package com.spring.springbook.user.service;
+package com.spring.springbook.user.service.sqlservice;
 
 import com.spring.springbook.user.dao.UserDao;
 import com.spring.springbook.user.service.jaxb.SqlType;

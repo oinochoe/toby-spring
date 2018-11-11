@@ -3,6 +3,7 @@ package com.spring.springbook.user.service;
 import com.spring.springbook.user.dao.UserDao;
 import com.spring.springbook.user.domain.Level;
 import com.spring.springbook.user.domain.User;
+import com.spring.springbook.user.service.sqlservice.UserService;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 

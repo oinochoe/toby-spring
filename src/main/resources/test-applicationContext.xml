@@ -39,7 +39,7 @@
         <property name="sqlService" ref="sqlService" />
     </bean>
 
-    <bean id="sqlService" class="com.spring.springbook.user.service.XmlSqlService">
+    <bean id="sqlService" class="com.spring.springbook.user.service.sqlservice.XmlSqlService">
         <property name="sqlmapFile" value="sqlmap.xml"/>
     </bean>
 

@@ -1,4 +1,6 @@
-package com.spring.springbook.user.service;
+package com.spring.springbook.user.service.sqlservice;
+
+import com.spring.springbook.user.service.sqlservice.SqlService;
 
 import java.util.Map;
 

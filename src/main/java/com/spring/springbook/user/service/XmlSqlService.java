@@ -4,6 +4,7 @@ import com.spring.springbook.user.dao.UserDao;
 import com.spring.springbook.user.service.jaxb.SqlType;
 import com.spring.springbook.user.service.jaxb.Sqlmap;
 
+import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -12,15 +13,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class XmlSqlService implements SqlService {
+
     private Map<String, String> sqlMap = new HashMap<String, String>(); // 읽어온 SQL을 저장해둘 Map
 
-    public XmlSqlService() { // 스프링이 오브젝트를 만드는 시점에서 SQL을 읽어오도록 생성자를 이용한다.
-        String contextPath = Sqlmap.class.getPackage().getName(); // JAXB API를 이용해 XML 문서를 오브젝트 트리로 읽어온다.
+    private String sqlmapFile;
+
+    public void setSqlmapFile(String sqlmapFile) {
+        this.sqlmapFile = sqlmapFile;
+    }
+
+    @PostConstruct // loadSql()메소드를 빈의 초기화 메소드로 지정한다.
+    public void loadSql() {
+        String contextPath = Sqlmap.class.getPackage().getName();
         try {
             JAXBContext context = JAXBContext.newInstance(contextPath);
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            // UserDao와 같은 클래스패스의 sqlMap.xml파일을 변환한다.
-            InputStream is = UserDao.class.getResourceAsStream("sqlmap.xml");
+            // 프로퍼티로 설정을 통해 제공받은 파일 이름을 사용한다.
+            InputStream is = UserDao.class.getResourceAsStream(this.sqlmapFile);
             Sqlmap sqlmap = (Sqlmap)unmarshaller.unmarshal(is);
 
             for (SqlType sql : sqlmap.getSql()) {

@@ -1,7 +1,5 @@
 package com.spring.springbook.user.service.sqlservice;
 
-import com.spring.springbook.user.service.sqlservice.SqlService;
-
 import java.util.Map;
 
 public class SimpleSqlService implements SqlService {
